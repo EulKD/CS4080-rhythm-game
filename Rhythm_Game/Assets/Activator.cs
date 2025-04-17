@@ -8,17 +8,29 @@ public class Activator : MonoBehaviour
     public KeyCode key;
     bool active = false;
     GameObject note;
+    SpriteRenderer sr;
+    Color old;
+
+    void Awake()
+    {
+        sr=GetComponent<SpriteRenderer>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        old=sr.color;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(key) && active)
+        if (Input.GetKeyDown(key))
+        {
+            StartCoroutine(Pressed());
+        }
+
+            if (Input.GetKeyDown(key) && active)
         {
             Destroy(note);
         }
@@ -36,5 +48,13 @@ public class Activator : MonoBehaviour
     void OnTriggerExit2D(Collider2D collider)
     {
         active = false;
+    }
+
+    IEnumerator Pressed()
+    {
+        sr.color = new Color(0, 0, 0);
+        yield return new WaitForSeconds(0.1f);
+        sr.color = old;
+
     }
 }

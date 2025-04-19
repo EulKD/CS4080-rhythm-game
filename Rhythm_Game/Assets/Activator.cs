@@ -7,9 +7,11 @@ public class Activator : MonoBehaviour
 
     public KeyCode key;
     bool active = false;
-    GameObject note;
+    GameObject note, gm;
     SpriteRenderer sr;
     Color old;
+    public bool createMode;
+    public GameObject n;
 
     void Awake()
     {
@@ -19,42 +21,64 @@ public class Activator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        old=sr.color;
+        gm = GameObject.Find("GameManager");
+        old = sr.color;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(key))
+        if (createMode)
         {
-            StartCoroutine(Pressed());
+            if (Input.GetKeyDown(key))
+            {
+                Instantiate(n, transform.position, Quaternion.identity);
+            }
         }
+        else
+        {
+
+            if (Input.GetKeyDown(key))
+            {
+                StartCoroutine(Pressed());
+            }
 
             if (Input.GetKeyDown(key) && active)
-        {
-            Destroy(note);
-            AddScore();
-            active = false;
+            {
+                Destroy(note);
+                gm.GetComponent<GameManager>().AddStreak();
+                AddScore();
+                active = false;
+            }
+            else if (Input.GetKeyDown(key) && !active)
+            {
+                gm.GetComponent<GameManager>().ResetStreak();
+            }
         }
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        active = true;
+        if (col.gameObject.tag == "WinNote")
+        {
+            gm.GetComponent<GameManager>().Win();
+        }
+        
         if (col.gameObject.tag == "Note")
         {
             note=col.gameObject;
+            active = true;
         }
     }
 
-    void OnTriggerExit2D(Collider2D collider)
+    void OnTriggerExit2D(Collider2D col)
     {
-        active = false;
+        active=false;
     }
 
     void AddScore()
     {
-        PlayerPrefs.SetInt("Score", PlayerPrefs.GetInt("Score") + 10);
+        PlayerPrefs.SetInt("Score", PlayerPrefs.GetInt("Score") + gm.GetComponent<GameManager>().GetScore());
     }
 
     IEnumerator Pressed()

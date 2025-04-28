@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
 
     int multiplier = 1;
     int streak = 0;
+    public string gameOverScene = "GameOverScene";
+    public string winScene = "WinScene";
 
     // Start is called before the first frame update
     void Start()
@@ -27,19 +30,20 @@ public class GameManager : MonoBehaviour
         {
             // If the note reaches the GameManager without being hit, reset streak
             ResetStreak();
-            Destroy(col.gameObject); // Remove the missed note
+            Destroy(col.gameObject);
         }
     }
 
     public void AddStreak()
     {
-        if(PlayerPrefs.GetInt("Meter")+1<50)
+        if(PlayerPrefs.GetInt("Meter")+1<=25) // Set max limit for meter
         {
-            PlayerPrefs.SetInt("Meter", PlayerPrefs.GetInt("Meter") + 1);
+            PlayerPrefs.SetInt("Meter", PlayerPrefs.GetInt("Meter") + 1);   // Increase meter
         }
 
-        streak++;
+        streak++;   // Increment streak
 
+        // Multiplier cases
         switch (streak)
         {
             case int s when s >= 20:
@@ -56,43 +60,47 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        //if (streak >= 30) multiplier = 4;
-        //else if (streak >= 20) multiplier = 3;
-        //else if (streak >= 10) multiplier = 2;
-        //else multiplier = 1;
-
         UpdateGUI();
     }
 
     public void ResetStreak()
     {
-        if (PlayerPrefs.GetInt("Meter") < 0)
+        // Lose when meter reaches 0
+        if (PlayerPrefs.GetInt("Meter") <= 0)
         {
             Lose();
+            return;
         }
 
+        // Decrease on missed note and reset streak
         PlayerPrefs.SetInt("Meter", PlayerPrefs.GetInt("Meter") - 2);
         streak = 0;
         multiplier = 1;
         UpdateGUI();
     }
-
+    
+    // Update streak and multiplier text
     void UpdateGUI()
     {
         PlayerPrefs.SetInt("Streak",streak);
         PlayerPrefs.SetInt("Mult",multiplier);
     }
 
+    // Go to lose screen
     void Lose()
     {
-        print("game lost");
+        Debug.Log("Game lost - loading game over scene");
+        SceneManager.LoadScene(gameOverScene);
     }
 
+    // Go to win screen
     public void Win()
     {
-        print("game won");
+        Debug.Log("Game won - loading win scene");
+        SceneManager.LoadScene(winScene);
     }
 
+    // Calculate score
     public int GetScore()
     {
         return 10 * multiplier;

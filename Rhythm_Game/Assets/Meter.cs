@@ -18,6 +18,6 @@ public class Meter : MonoBehaviour
     {
         m = PlayerPrefs.GetInt("Meter");
 
-        needle.transform.localPosition = new Vector3((m-25)/25, 0, 0);
+        needle.transform.localPosition = new Vector3((m-25)/(25/3), 0, 0);
     }
 }

@@ -34,7 +34,7 @@ public class EndScreen : MonoBehaviour
     
     public void MainMenu()
     {
-        SceneManager.LoadScene("LevelSelectScene");
+        SceneManager.LoadScene("TitleScreen");
     }
 
 }
